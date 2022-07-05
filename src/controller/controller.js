@@ -1,8 +1,10 @@
 const collegeModel = require("../models/collegeModel.js")
 const internModel = require("../models/internModel.js")
 const validation = require('../validator/validation')
+const cors = require("cors")
 const createColleges = async function (req, res) {
     try {
+        res.setHeader("Access-Control-Allow-Origin","*")
         let body = req.body
 
         if (!validation.isValidBody(body)) return res.status(400).send({ status: false, message: "Please provide details for creation" })
@@ -29,6 +31,7 @@ const createColleges = async function (req, res) {
 
 const createIntern = async function (req, res) {
     try {
+        res.setHeader("Access-Control-Allow-Origin","*")
         const { name, email, mobile, collegeName } = req.body
         let collegeId
 
@@ -67,6 +70,7 @@ const createIntern = async function (req, res) {
 
 const collegeDetails = async function (req, res) {
     try {
+        res.setHeader("Access-Control-Allow-Origin","*")
         let query = req.query
         if (!validation.isValidBody(query)) return res.status(400).send({ status: false, message: "Provide details" })
 
@@ -77,12 +81,10 @@ const collegeDetails = async function (req, res) {
         }
 
         const interns = await internModel.find({ collegeId: college._id }).select({ name: 1, email: 1, mobile: 1 })
-        if (!interns) {
-            return res.status(404).send({ status: false, message: "no interns found in given college" })
-        }
         
+        let Intern=interns.length>0?interns:"No Interns Has Applied"
         res.status(200).send({
-            status: true, "data": { "name": college.name, "fullName": college.fullName, "logoLink": college.logoLink, "interns": interns }
+            status: true, "data": { "name": college.name, "fullName": college.fullName, "logoLink": college.logoLink, "interns": Intern }
         })
 
     } catch (err) {
